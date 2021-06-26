@@ -1,0 +1,7 @@
+{
+  "name": "Nama-Counter",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
