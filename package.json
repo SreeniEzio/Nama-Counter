@@ -3,11 +3,13 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "@capacitor/android": "3.0.2",
     "@capacitor/app": "1.0.1",
     "@capacitor/core": "3.0.1",
     "@capacitor/haptics": "1.0.1",
     "@capacitor/keyboard": "1.0.1",
     "@capacitor/status-bar": "1.0.1",
+    "@ionic-native/android-exoplayer": "^5.33.1",
     "@ionic/react": "^5.5.0",
     "@ionic/react-router": "^5.5.0",
     "@testing-library/jest-dom": "^5.11.9",
@@ -19,6 +21,8 @@
     "@types/react-dom": "^16.9.10",
     "@types/react-router": "^5.1.11",
     "@types/react-router-dom": "^5.1.7",
+    "cordova-plugin-exoplayer": "^2.5.4",
+    "howler": "^2.2.1",
     "ionicons": "^5.4.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
@@ -65,7 +69,8 @@
     ]
   },
   "devDependencies": {
-    "@capacitor/cli": "3.0.1"
+    "@capacitor/cli": "3.0.1",
+    "@types/howler": "^2.2.2"
   },
   "description": "An Ionic project"
 }
