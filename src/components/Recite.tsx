@@ -2,37 +2,27 @@ import { IonButton, IonIcon, IonGrid, IonLabel, IonRow, IonCol, IonRange } from 
 import { playOutline, pause, toggle } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import "./Recite.css";
-import { Howl, Howler } from 'howler';
+import ReactAudioPlayer from 'react-audio-player';
 const snipe = require("../audioClip/test.mp3");
-
-const useAudio = (url: string | undefined) => {
-    //const [audio] = useState(new Audio(url));
-    const [playing, setPlaying] = useState(false);
-  
-    
-  
-    // useEffect(() => {
-    //     playing ? audio.play().then(()=>{console.log("Playing");}).catch(e => {console.log(e);}) : audio.pause();
-    //   },
-    //   [playing]
-    // );
-  
-    // useEffect(() => {
-    //   audio.addEventListener('ended', () => setPlaying(false));
-    //   return () => {
-    //     audio.removeEventListener('ended', () => setPlaying(false));
-    //   };
-    // }, []);
-  
-    return [playing, toggle];
-  };
 
 const Recite: React.FC = () => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [count, setCount] = useState<number>(0);
+
     const [speed, setSpeed] = useState(1);
+    const url = "https://assets.coderrocketfuel.com/pomodoro-times-up.mp3";
 
+    const audio = new Audio(url);
+        audio.playbackRate = speed;
+        audio.loop = true;
 
+    //const audioEl: any = document.getElementsByClassName("audio-element")[0];
+
+    // audioEl.addEventListener('ended', function () {
+    //     audioEl.currentTime = 0;
+    //     audioEl.play().then(() => {setCount(count+1);}).catch();
+    //   }, false);
+    
     const toggle: any = () => {setIsPlaying(!isPlaying)};
 
     const saveCount = () => {
@@ -40,16 +30,7 @@ const Recite: React.FC = () => {
         const key = date.getDate().toString() +(date.getMonth()+1).toString() + date.getFullYear().toString();
         
     }
-    const playAudio = () => {
-        //console.log(document.getElementsByClassName("audio-element"));
-        const audioEl: any = document.getElementsByClassName("audio-element")[0];
-        audioEl.playbackRate = speed;
-        if(isPlaying)
-            setCount(count+1);
-        
-        isPlaying ? audioEl.pause() : audioEl.play();
-        
-    }
+    
 
     return (
         <IonGrid>
@@ -78,19 +59,12 @@ const Recite: React.FC = () => {
                     <IonButton size="default"
                         fill="solid"
                         color={isPlaying ? "warning" : "success" } 
-                        onClick={() => {
-                            toggle();
-                            playAudio();
-                            }}>
+                        onClick={toggle}>
                         <IonIcon slot="start" icon={isPlaying ? pause : playOutline} />
                         {isPlaying ? "Pause" : "Play"}
                     </IonButton>
-                    <audio className="audio-element" onEnded={() => {
-                        if(isPlaying)
-                            setCount(count+1);
-                        }} loop >
-                        <source src="https://assets.coderrocketfuel.com/pomodoro-times-up.mp3" type="audio/mpeg"></source>
-                    </audio>
+                    
+                    
                 </IonCol>
             </IonRow>
         </IonGrid>
@@ -100,3 +74,10 @@ const Recite: React.FC = () => {
 };
 
 export default Recite;
+
+
+
+// <audio className="audio-element"  >
+//                         <source src={url} type="audio/mpeg"></source>
+//                         Didn't Work
+//                     </audio>
