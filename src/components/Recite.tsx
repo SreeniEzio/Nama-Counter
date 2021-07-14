@@ -1,34 +1,53 @@
 import { IonButton, IonIcon, IonGrid, IonLabel, IonRow, IonCol, IonRange } from "@ionic/react";
-import { playOutline, pause, toggle } from "ionicons/icons";
+import { playOutline, pause } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import "./Recite.css";
-import ReactAudioPlayer from 'react-audio-player';
-const snipe = require("../audioClip/test.mp3");
+//@ts-ignore
+import snipe from "../assets/test.webm";
+
 
 const Recite: React.FC = () => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [count, setCount] = useState<number>(0);
 
     const [speed, setSpeed] = useState(1);
-    const url = "https://assets.coderrocketfuel.com/pomodoro-times-up.mp3";
+    
+    //const url = "https://assets.coderrocketfuel.com/pomodoro-times-up.mp3";
+    //const url = snipe;
 
-    const audio = new Audio(url);
+        
+    useEffect(() => {
+        const audio = new Audio(snipe);
         audio.playbackRate = speed;
-        audio.loop = true;
+        audio.onended = () => {setCount(count+1);}
+        if(isPlaying){
+            const play = audio.play();
+        }
+    }, [isPlaying, count]);
 
-    //const audioEl: any = document.getElementsByClassName("audio-element")[0];
-
-    // audioEl.addEventListener('ended', function () {
-    //     audioEl.currentTime = 0;
-    //     audioEl.play().then(() => {setCount(count+1);}).catch();
-    //   }, false);
     
     const toggle: any = () => {setIsPlaying(!isPlaying)};
 
-    const saveCount = () => {
+    const saveCount = async () => {
         const date = new Date();
-        const key = date.getDate().toString() +(date.getMonth()+1).toString() + date.getFullYear().toString();
-        
+        const key = date.getDate().toString() + '-' + (date.getMonth()+1).toString() + '-' + date.getFullYear().toString();
+        const url = "http://localhost:3000/items";
+        const data = {date: key, count: count};
+        try{
+            const response = await fetch(url, {
+                body: JSON.stringify(data),
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                method: "POST",
+              });
+              if (!response.ok) {
+                throw Error(response.statusText);
+              }
+              const json = await response.json()
+        }catch (error) {
+            console.error(error.message);
+        }
     }
     
 
@@ -52,10 +71,10 @@ const Recite: React.FC = () => {
             </IonRow>
 
             <IonRow className="ion-justify-content-center">
-                <IonCol size="auto">
+                <IonCol size="auto" className="ion-padding">
                     <IonButton color="warning" onClick={saveCount}>Save Count</IonButton>
                 </IonCol>
-                <IonCol size="auto" >
+                <IonCol size="auto" className="ion-padding">
                     <IonButton size="default"
                         fill="solid"
                         color={isPlaying ? "warning" : "success" } 

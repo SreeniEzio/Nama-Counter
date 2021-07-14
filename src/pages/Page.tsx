@@ -38,10 +38,7 @@ const Page: React.FC = () => {
             <IonTitle>{name}</IonTitle>
           </IonToolbar>
         </IonHeader>
-
-        <IonContent fullscreen>
-          <Tracking />
-        </IonContent>
+        <Tracking />
       </IonPage>
     );
   }
