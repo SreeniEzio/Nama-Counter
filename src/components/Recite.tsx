@@ -5,12 +5,18 @@ import "./Recite.css";
 //@ts-ignore
 import snipe from "../assets/test.webm";
 
+interface Entry {
+    id: number;
+    date: string;
+    count: number;
+  }
 
 const Recite: React.FC = () => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [count, setCount] = useState<number>(0);
-
     const [speed, setSpeed] = useState(1);
+
+    const url = "http://localhost:3000/items";
     
     //const url = "https://assets.coderrocketfuel.com/pomodoro-times-up.mp3";
     //const url = snipe;
@@ -25,14 +31,44 @@ const Recite: React.FC = () => {
         }
     }, [isPlaying, count]);
 
+    const isExisting = async (data: { date: string, count: number }) => {
+        const response = await fetch(url);
+        const log = await response.json();
+        const existingData: Entry = log.filter((item: Entry) => {return item.date === data.date})[0];
+        
+        if(!existingData){
+            return false;
+        }
+        data.count += existingData.count;
+        try {
+            const response = await fetch(url + '/' + existingData.id.toString(), {
+              body: JSON.stringify(data),
+              headers: {
+                "Content-Type": "application/json",
+              },
+              method: "PUT",
+            })
+            if (!response.ok) {
+              throw Error(response.statusText)
+            }
+            const json = await response.json();
+          } catch (error) {
+            console.error(error.message);
+          }
+        return true;
+    }
     
     const toggle: any = () => {setIsPlaying(!isPlaying)};
 
     const saveCount = async () => {
         const date = new Date();
-        const key = date.getDate().toString() + '-' + (date.getMonth()+1).toString() + '-' + date.getFullYear().toString();
-        const url = "http://localhost:3000/items";
-        const data = {date: key, count: count};
+        const keyDate = date.getDate().toString() + '-' + (date.getMonth()+1).toString() + '-' + date.getFullYear().toString();
+        
+        const data = {date: keyDate, count: count};
+        
+        if(isExisting(data)){
+            return;
+        }
         try{
             const response = await fetch(url, {
                 body: JSON.stringify(data),
@@ -93,10 +129,3 @@ const Recite: React.FC = () => {
 };
 
 export default Recite;
-
-
-
-// <audio className="audio-element"  >
-//                         <source src={url} type="audio/mpeg"></source>
-//                         Didn't Work
-//                     </audio>

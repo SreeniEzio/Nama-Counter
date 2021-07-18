@@ -51,9 +51,12 @@ const Tracking: React.FC = () => {
     //@ts-ignore
     const datePart = selectedDate.split('T')[0];
     //@ts-ignore
-    const dateSplitted = datePart.split('-');
+    let dateSplitted = datePart.split('-');
+    let month = dateSplitted[1];
+    month = Number(month).toString();
+    dateSplitted[1] = month;
     const date = dateSplitted.reverse().map(e => e).join("-");
-    //let id = isDateExist(date);
+    
     let existingEntry = countLog.filter((item) => {return item.date === date})[0];
     if(existingEntry){
       //@ts-ignore
