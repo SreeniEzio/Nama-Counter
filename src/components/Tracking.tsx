@@ -6,7 +6,7 @@ import "./Tracking.css"
 interface Entry {
   id: number;
   date: string;
-  count: number;
+  count: number|undefined;
 }
 
 const Tracking: React.FC = () => {
@@ -21,12 +21,47 @@ const Tracking: React.FC = () => {
   const getCountLog = async () => {
     const response = await fetch(url);
     const data = await response.json();
-    setCountLog(data);
     //console.log(data);
+    let sum = 0;
+    data.map((entry: { count: number; }) => {sum += entry.count});
+    setCountLog(data);
+    setSumCount(sum);
   };
 
+  const editCountLog = async (id: number, date:string, count: number) => {
+    try {
+      const response = await fetch(url + '/' + id.toString(), {
+        body: JSON.stringify({date: date, count: count}),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "PUT",
+      })
+      if (!response.ok) {
+        throw Error(response.statusText)
+      }
+      const json = await response.json()
+      getCountLog();
+    } catch (error) {
+      console.error(error.message)
+    }
+  }
+
   const addCountLog = async () => {
-    const data = {date: selectedDate, count: selectedCount}
+    //@ts-ignore
+    const datePart = selectedDate.split('T')[0];
+    //@ts-ignore
+    const dateSplitted = datePart.split('-');
+    const date = dateSplitted.reverse().map(e => e).join("-");
+    //let id = isDateExist(date);
+    let existingEntry = countLog.filter((item) => {return item.date === date})[0];
+    if(existingEntry){
+      //@ts-ignore
+      editCountLog(existingEntry.id, existingEntry.date, selectedCount);
+      return;
+    }
+    let data = {date: date, count: selectedCount};
+    
     try{
       const response = await fetch(url, {
           body: JSON.stringify(data),
@@ -42,19 +77,23 @@ const Tracking: React.FC = () => {
     }catch (error) {
       console.error(error.message);
     }
+    getCountLog();
   };
 
-  const handleAddBtn = () => {
-    setShowModal(true);
-    
-  };
+  const isDateExist = (target_date: string) => {
+    for (let i = 0; i < countLog.length; i++){
+      if(countLog[i].date == target_date){
+        return countLog[i].id;
+      }
+    }
+
+    return false;
+  }
 
   useEffect(() => {
     getCountLog();
-    let sum = 0;
-    countLog.map((entry) => {sum += entry.count});
-    setSumCount(sum);
   }, []);
+
   return (
     <IonContent fullscreen>
       <IonRow className="ion-padding ion-justify-content-center large-font">
@@ -67,7 +106,7 @@ const Tracking: React.FC = () => {
         </IonRow>
         <IonLabel className="text-font">Date:</IonLabel>
         <IonDatetime 
-          displayFormat="DD-MM-YYYY" 
+          displayFormat="D-M-YYYY" 
           onIonChange={e => setSelectedDate(e.detail.value!)}
           cancelText="Cancel"
           placeholder="Select Date"
@@ -87,10 +126,14 @@ const Tracking: React.FC = () => {
             setSelectedCount(undefined)}}
           color="danger"
           className="ion-padding">Cancel</IonButton>
-          <IonButton onClick={() => {addCountLog();
-            setShowModal(false);
-            setSelectedDate("");
-            setSelectedCount(undefined)}} color="success" className="ion-padding">Save</IonButton>
+          <IonButton 
+            onClick={() => {addCountLog();
+              setShowModal(false);
+              setSelectedDate("");
+              setSelectedCount(undefined);
+            }}
+            color="success" 
+            className="ion-padding">Save</IonButton>
         </IonRow>
         </div>
       </IonModal>
@@ -99,7 +142,7 @@ const Tracking: React.FC = () => {
       <IonGrid className="ion-padding">
         <IonRow className="ion-justify-content-end">
           <IonCol size="auto" className="ion-padding">
-            <IonButton size="default" fill="solid" color="orange" onClick={handleAddBtn}>
+            <IonButton size="default" fill="solid" color="orange" onClick={() => {setShowModal(true);}}>
               <IonIcon slot="start" icon={addOutline}></IonIcon>
               Add/Edit
             </IonButton>
@@ -121,7 +164,7 @@ const Tracking: React.FC = () => {
             return(
               <IonRow key={entry.id}>
                 <IonCol className="col-border ion-text-center">
-                  {entry.id+1}
+                  {entry.id}
                 </IonCol>
                 <IonCol  className="col-border ion-text-center">
                   {entry.date}
