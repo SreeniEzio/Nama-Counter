@@ -3,13 +3,13 @@ import { playOutline, pause } from "ionicons/icons";
 import { useEffect, useState } from "react";
 import "./Recite.css";
 //@ts-ignore
-import snipe from "../assets/test.webm";
+import nama from "../assets/nama.m4a";
 
 interface Entry {
     id: number;
     date: string;
     count: number;
-  }
+}
 
 const Recite: React.FC = () => {
     const [isPlaying, setIsPlaying] = useState(false);
@@ -19,11 +19,11 @@ const Recite: React.FC = () => {
     const url = "http://localhost:3000/items";
     
     //const url = "https://assets.coderrocketfuel.com/pomodoro-times-up.mp3";
-    //const url = snipe;
+    //const url = nama;
 
         
     useEffect(() => {
-        const audio = new Audio(snipe);
+        const audio = new Audio(nama);
         audio.playbackRate = speed;
         audio.onended = () => {setCount(count+1);}
         if(isPlaying){
